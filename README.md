@@ -4,4 +4,4 @@ This repo contains a demonstration of Z-Order Approximation for storing rectangl
 
 See [main](main.go) for more information.
 
-![Z-Order Grid Representation showing bounds that a shape is contained in](rect.jp)
+![Z-Order Grid Representation showing bounds that a shape is contained in](rect.jpg)
