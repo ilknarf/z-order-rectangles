@@ -48,7 +48,7 @@ const (
 
 	// number of bits within each dimension to use for precision
 	// the less bits there are, the bigger the matches are.
-	precisionBits = 4
+	precisionBits = 6
 
 	inc = 1 << (maxDimBits - precisionBits)
 
@@ -81,11 +81,6 @@ func main() {
 
 	// calculate max and min range using rect val for convenience
 	// truncating 4 bits for every dimension bit we want to truncate
-	truncBits := (maxDimBits - precisionBits) * 4
-	minRectVal := rect.Val >> uint64(truncBits)
-	minRectVal <<= uint64(truncBits)
-
-	minRect := &RectHash{Val: minRectVal}
 
 	fmt.Printf("encoded value: %d\n", rect.Val)
 	fmt.Printf("encoded binary value: 0b%s\n", strconv.FormatUint(rect.Val, 2))
@@ -95,16 +90,16 @@ func main() {
 
 	// calculate min and max span rectangles using above values
 	minSpanRect := &RectHash{}
-	minSpanRect.SetX0(minRect.X0() + inc)
-	minSpanRect.SetY0(minRect.Y0() + inc)
-	minSpanRect.SetX1(minRect.X1())
-	minSpanRect.SetY1(minRect.Y1())
+	minSpanRect.SetX0(min(rect.X0()+inc, maxDimVal))
+	minSpanRect.SetY0(min(rect.Y0()+inc, maxDimVal))
+	minSpanRect.SetX1(rect.X1() - min(rect.X1(), inc))
+	minSpanRect.SetY1(rect.Y1() - min(rect.Y1(), inc))
 
 	maxSpanRect := &RectHash{}
-	maxSpanRect.SetX0(minRect.X0())
-	maxSpanRect.SetY0(minRect.Y0())
-	maxSpanRect.SetX1(minRect.X1() + inc)
-	maxSpanRect.SetY1(minRect.Y1() + inc)
+	maxSpanRect.SetX0(rect.X0() - min(inc, rect.X0()))
+	maxSpanRect.SetY0(rect.Y0() - min(inc, rect.Y0()))
+	maxSpanRect.SetX1(min(rect.X1()+inc, maxDimVal))
+	maxSpanRect.SetY1(min(rect.Y1()+inc, maxDimVal))
 
 	fmt.Println("drawing rectangles")
 	// draw captured frame range and grid
